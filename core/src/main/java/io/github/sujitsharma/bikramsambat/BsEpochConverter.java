@@ -47,10 +47,13 @@ final class BsEpochConverter {
     }
 
     static BsDate fromLocalDate(LocalDate date) {
-        long epochDay = ChronoUnit.DAYS.between(AD_EPOCH, date);
+        return fromEpochDay(ChronoUnit.DAYS.between(AD_EPOCH, date));
+    }
+
+    static BsDate fromEpochDay(long epochDay) {
         long lastDay = YEAR_START_EPOCH_DAY[YEAR_START_EPOCH_DAY.length - 1];
         if (epochDay < 0 || epochDay >= lastDay) {
-            throw new BsDateException("Date " + date + " is outside the supported BS range ["
+            throw new BsDateException("Epoch day " + epochDay + " is outside the supported BS range ["
                     + BsCalendarData.MIN_YEAR + ", " + BsCalendarData.MAX_YEAR + "]");
         }
 

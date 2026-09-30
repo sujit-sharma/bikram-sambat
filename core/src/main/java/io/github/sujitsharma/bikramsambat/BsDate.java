@@ -49,6 +49,40 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         return new BsDate(year, month, day);
     }
 
+    public static BsDate of(int year, BsMonth month, int day) {
+        Objects.requireNonNull(month, "month");
+        return of(year, month.getValue(), day);
+    }
+
+    /**
+     * Creates a BS date from a year and a day-of-year (1-based), e.g.
+     * {@code ofYearDay(2082, 1)} is the same as {@code of(2082, 1, 1)}.
+     */
+    public static BsDate ofYearDay(int year, int dayOfYear) {
+        BsCalendarData.validateYear(year);
+        int lengthOfYear = BsCalendarData.lengthOfYear(year);
+        if (dayOfYear < 1 || dayOfYear > lengthOfYear) {
+            throw new BsDateException(
+                    "Invalid day of year: " + dayOfYear + " for " + year + " (expected 1-" + lengthOfYear + ")");
+        }
+        int[] monthLengths = BsCalendarData.monthLengths(year);
+        int month = 1;
+        int remaining = dayOfYear;
+        while (remaining > monthLengths[month - 1]) {
+            remaining -= monthLengths[month - 1];
+            month++;
+        }
+        return new BsDate(year, month, remaining);
+    }
+
+    /**
+     * Creates a BS date from an epoch day, i.e. the number of days since
+     * {@code BsDate.MIN} ({@code MIN} itself being epoch day {@code 0}).
+     */
+    public static BsDate ofEpochDay(long epochDay) {
+        return BsEpochConverter.fromEpochDay(epochDay);
+    }
+
     public static BsDate now() {
         return from(LocalDate.now());
     }
@@ -101,6 +135,15 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         return day;
     }
 
+    public int getDayOfYear() {
+        int[] monthLengths = BsCalendarData.monthLengths(year);
+        int total = day;
+        for (int m = 1; m < month; m++) {
+            total += monthLengths[m - 1];
+        }
+        return total;
+    }
+
     public DayOfWeek getDayOfWeek() {
         return toLocalDate().getDayOfWeek();
     }
@@ -136,11 +179,24 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         return plusDays(Math.negateExact(daysToSubtract));
     }
 
+    public BsDate plusWeeks(long weeksToAdd) {
+        return plusDays(Math.multiplyExact(weeksToAdd, 7));
+    }
+
+    public BsDate minusWeeks(long weeksToSubtract) {
+        return plusWeeks(Math.negateExact(weeksToSubtract));
+    }
+
+    /** Zero-based count of months since {@code BsCalendarData.MIN_YEAR}-01, used for month/period arithmetic. */
+    long prolepticMonth() {
+        return (long) (year - BsCalendarData.MIN_YEAR) * 12 + (month - 1);
+    }
+
     public BsDate plusMonths(long monthsToAdd) {
         if (monthsToAdd == 0) {
             return this;
         }
-        long totalMonths = (long) (year - BsCalendarData.MIN_YEAR) * 12 + (month - 1) + monthsToAdd;
+        long totalMonths = prolepticMonth() + monthsToAdd;
         int newYear = BsCalendarData.MIN_YEAR + Math.toIntExact(Math.floorDiv(totalMonths, 12));
         int newMonth = Math.toIntExact(Math.floorMod(totalMonths, 12)) + 1;
         BsCalendarData.validateYear(newYear);
@@ -166,6 +222,44 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         return plusYears(Math.negateExact(yearsToSubtract));
     }
 
+    /** Returns a copy of this date with the year altered, clamping the day if it no longer exists. */
+    public BsDate withYear(int newYear) {
+        if (newYear == year) {
+            return this;
+        }
+        BsCalendarData.validateYear(newYear);
+        int newDay = Math.min(day, BsCalendarData.lengthOfMonth(newYear, month));
+        return new BsDate(newYear, month, newDay);
+    }
+
+    /** Returns a copy of this date with the month-of-year altered, clamping the day if it no longer exists. */
+    public BsDate withMonth(int newMonth) {
+        if (newMonth == month) {
+            return this;
+        }
+        if (newMonth < 1 || newMonth > 12) {
+            throw new BsDateException("Invalid BS month value: " + newMonth + " (expected 1-12)");
+        }
+        int newDay = Math.min(day, BsCalendarData.lengthOfMonth(year, newMonth));
+        return new BsDate(year, newMonth, newDay);
+    }
+
+    public BsDate withMonth(BsMonth newMonth) {
+        Objects.requireNonNull(newMonth, "newMonth");
+        return withMonth(newMonth.getValue());
+    }
+
+    public BsDate withDayOfMonth(int newDayOfMonth) {
+        if (newDayOfMonth == day) {
+            return this;
+        }
+        return of(year, month, newDayOfMonth);
+    }
+
+    public BsDate withDayOfYear(int newDayOfYear) {
+        return ofYearDay(year, newDayOfYear);
+    }
+
     public boolean isBefore(BsDate other) {
         return compareTo(other) < 0;
     }
@@ -176,6 +270,36 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
 
     public boolean isEqual(BsDate other) {
         return compareTo(other) == 0;
+    }
+
+    /** Returns the first day of this date's BS month. */
+    public BsDate firstDayOfMonth() {
+        return withDayOfMonth(1);
+    }
+
+    /** Returns the last day of this date's BS month. */
+    public BsDate lastDayOfMonth() {
+        return withDayOfMonth(lengthOfMonth());
+    }
+
+    /** Returns the first day of the BS month after this date's month. */
+    public BsDate firstDayOfNextMonth() {
+        return plusMonths(1).withDayOfMonth(1);
+    }
+
+    /** Returns the first day of this date's BS year. */
+    public BsDate firstDayOfYear() {
+        return withDayOfYear(1);
+    }
+
+    /** Returns the last day of this date's BS year. */
+    public BsDate lastDayOfYear() {
+        return of(year, 12, BsCalendarData.lengthOfMonth(year, 12));
+    }
+
+    /** Returns the first day of the BS year after this date's year. */
+    public BsDate firstDayOfNextYear() {
+        return of(year + 1, 1, 1);
     }
 
     /**
@@ -199,15 +323,21 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
     }
 
     private long monthsUntil(BsDate end) {
-        long totalThis = (long) (year - BsCalendarData.MIN_YEAR) * 12 + (month - 1);
-        long totalEnd = (long) (end.year - BsCalendarData.MIN_YEAR) * 12 + (end.month - 1);
-        long months = totalEnd - totalThis;
+        long months = end.prolepticMonth() - prolepticMonth();
         if (months > 0 && end.day < day) {
             months--;
         } else if (months < 0 && end.day > day) {
             months++;
         }
         return months;
+    }
+
+    /**
+     * Computes the years/months/days breakdown between this date and another,
+     * mirroring {@link LocalDate#until(java.time.chrono.ChronoLocalDate)}.
+     */
+    public BsPeriod until(BsDate endDateExclusive) {
+        return BsPeriod.between(this, endDateExclusive);
     }
 
     /**

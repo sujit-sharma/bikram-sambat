@@ -33,4 +33,15 @@ public enum BsMonth {
         }
         return values()[month - 1];
     }
+
+    /** Returns the month that is the given number of months after this one, wrapping around the year. */
+    public BsMonth plus(long months) {
+        int amount = (int) Math.floorMod(months, 12);
+        return values()[(ordinal() + amount) % 12];
+    }
+
+    /** Returns the month that is the given number of months before this one, wrapping around the year. */
+    public BsMonth minus(long months) {
+        return plus(-Math.floorMod(months, 12));
+    }
 }
