@@ -83,10 +83,12 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         return BsEpochConverter.fromEpochDay(epochDay);
     }
 
+    /** Returns today's BS date in the system default timezone. */
     public static BsDate now() {
         return from(LocalDate.now());
     }
 
+    /** Returns today's BS date in the specified timezone. */
     public static BsDate now(ZoneId zone) {
         return from(LocalDate.now(zone));
     }
@@ -95,6 +97,11 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         return from(LocalDate.now(clock));
     }
 
+    /**
+     * Creates a BS date from a Gregorian calendar date. No timezone conversion
+     * is performed; use {@link LocalDate#of(int, int, int)} after converting an
+     * instant to the desired timezone when starting from a timestamp.
+     */
     public static BsDate from(LocalDate localDate) {
         Objects.requireNonNull(localDate, "localDate");
         return BsEpochConverter.fromLocalDate(localDate);
@@ -160,6 +167,10 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         return lengthOfYear() == 366;
     }
 
+    /**
+     * Returns the Gregorian calendar date corresponding to this BS date.
+     * The result is timezone-free, just like {@link LocalDate}.
+     */
     public LocalDate toLocalDate() {
         return BsEpochConverter.toLocalDate(year, month, day);
     }
@@ -196,7 +207,10 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         if (monthsToAdd == 0) {
             return this;
         }
-        long totalMonths = prolepticMonth() + monthsToAdd;
+        // The adjustment is a long, so guard the addition before converting it
+        // back to the supported year range. Plain addition could wrap for
+        // extreme inputs such as Long.MAX_VALUE.
+        long totalMonths = Math.addExact(prolepticMonth(), monthsToAdd);
         int newYear = BsCalendarData.MIN_YEAR + Math.toIntExact(Math.floorDiv(totalMonths, 12));
         int newMonth = Math.toIntExact(Math.floorMod(totalMonths, 12)) + 1;
         BsCalendarData.validateYear(newYear);
@@ -212,7 +226,7 @@ public final class BsDate implements Comparable<BsDate>, Serializable {
         if (yearsToAdd == 0) {
             return this;
         }
-        int newYear = Math.toIntExact(year + yearsToAdd);
+        int newYear = Math.toIntExact(Math.addExact((long) year, yearsToAdd));
         BsCalendarData.validateYear(newYear);
         int newDay = Math.min(day, BsCalendarData.lengthOfMonth(newYear, month));
         return new BsDate(newYear, month, newDay);
