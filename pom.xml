@@ -14,7 +14,7 @@
         A Java library for working with Bikram Sambat (Nepali) dates, designed to feel like
         java.time.LocalDate, with accurate conversion to and from the Gregorian calendar.
     </description>
-    <url>https://github.com/sujitsharma/bikram-sambat</url>
+    <url>https://github.com/sujit-sharma/bikram-sambat</url>
 
     <licenses>
         <license>
@@ -84,7 +84,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/sujitsharma/bikram-sambat</url>
+            <url>https://maven.pkg.github.com/sujit-sharma/bikram-sambat</url>
         </repository>
     </distributionManagement>
 
