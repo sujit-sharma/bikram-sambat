@@ -22,14 +22,44 @@ This is a multi-module Maven project (Java 21):
 
 - `core` (artifact `bikram-sambat`) — the `BsDate` type, BS↔AD conversion
   engine, and no third-party runtime dependencies. This is the only module
-  published so far.
+  required for calendar operations.
+- `jpa` (artifact `bikram-sambat-jpa`) — JPA `AttributeConverter` support for
+  storing `BsDate` values in SQL `DATE` columns.
 
 Planned modules, added incrementally:
 
 - `bikram-sambat-jackson` — Jackson serialization/deserialization support.
-- `bikram-sambat-jpa` — JPA/Hibernate `AttributeConverter` for persisting
-  `BsDate` as a Gregorian `DATE` column.
 - `bikram-sambat-spring-boot-starter` — auto-configuration wiring the above.
+
+## JPA / Hibernate
+
+Add `bikram-sambat-jpa` alongside your JPA provider. Its converter stores the
+Gregorian date corresponding to a `BsDate`; Hibernate maps `LocalDate` to SQL
+`DATE`. The converter has `autoApply = true`, so it applies to mapped
+`BsDate` attributes once the JPA provider discovers the converter class.
+
+```xml
+<dependency>
+    <groupId>io.github.sujitsharma</groupId>
+    <artifactId>bikram-sambat-jpa</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+```java
+@Entity
+class Customer {
+    @Id
+    private Long id;
+
+    private BsDate birthDate;
+}
+```
+
+If your persistence setup does not discover converters automatically, list
+`io.github.sujitsharma.bikramsambat.jpa.BsDateAttributeConverter` in the
+persistence unit or annotate the field with `@Convert(converter =
+BsDateAttributeConverter.class)`.
 
 ## Building
 
