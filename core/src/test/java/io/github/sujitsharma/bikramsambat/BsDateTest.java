@@ -100,4 +100,81 @@ class BsDateTest {
         assertEquals(date, BsDate.parse("2082-06-13"));
         assertEquals("2082-06-13", date.format("yyyy-MM-dd"));
     }
+
+    @Test
+    void ofYearDayComputesCorrectMonthAndDay() {
+        assertEquals(BsDate.of(2082, 1, 1), BsDate.ofYearDay(2082, 1));
+        // BS 2082 month 1 (Baishakh) has 31 days, so day 32 of the year is month 2 day 1.
+        assertEquals(BsDate.of(2082, 2, 1), BsDate.ofYearDay(2082, 32));
+        // BS 2082 has 365 days total; the last day of the year is month 12 day 30.
+        assertEquals(BsDate.of(2082, 12, 30), BsDate.ofYearDay(2082, 365));
+        assertThrows(BsDateException.class, () -> BsDate.ofYearDay(2082, 366));
+    }
+
+    @Test
+    void getDayOfYearMatchesOfYearDay() {
+        BsDate date = BsDate.of(2082, 2, 1);
+        assertEquals(32, date.getDayOfYear());
+    }
+
+    @Test
+    void epochDayRoundTripsAndMinIsZero() {
+        assertEquals(0L, BsDate.MIN.toEpochDay());
+        assertEquals(BsDate.MIN, BsDate.ofEpochDay(0));
+
+        BsDate date = BsDate.of(2082, 6, 13);
+        assertEquals(date, BsDate.ofEpochDay(date.toEpochDay()));
+    }
+
+    @Test
+    void withYearClampsDayWhenTargetMonthIsShorter() {
+        // BS 2082 month 3 (Ashadh) has 32 days, BS 2072 month 3 has only 31.
+        BsDate date = BsDate.of(2082, 3, 32);
+        assertEquals(BsDate.of(2072, 3, 31), date.withYear(2072));
+    }
+
+    @Test
+    void withMonthClampsDayToShorterMonth() {
+        BsDate date = BsDate.of(2082, 7, 30);
+        assertEquals(BsDate.of(2082, 8, 29), date.withMonth(8));
+        assertEquals(BsDate.of(2082, 8, 29), date.withMonth(BsMonth.MANGSIR));
+    }
+
+    @Test
+    void withDayOfMonthAndDayOfYear() {
+        BsDate date = BsDate.of(2082, 1, 1);
+        assertEquals(BsDate.of(2082, 1, 15), date.withDayOfMonth(15));
+        assertEquals(BsDate.of(2082, 2, 1), date.withDayOfYear(32));
+        assertThrows(BsDateException.class, () -> date.withDayOfMonth(32));
+    }
+
+    @Test
+    void monthAndYearBoundaryAdjusters() {
+        BsDate midMonth = BsDate.of(2082, 7, 15);
+        assertEquals(BsDate.of(2082, 7, 1), midMonth.firstDayOfMonth());
+        assertEquals(BsDate.of(2082, 7, 30), midMonth.lastDayOfMonth());
+
+        BsDate midYear = BsDate.of(2082, 7, 1);
+        assertEquals(BsDate.of(2082, 1, 1), midYear.firstDayOfYear());
+        assertEquals(BsDate.of(2082, 12, 30), midYear.lastDayOfYear());
+
+        BsDate lastMonthOfYear = BsDate.of(2082, 12, 15);
+        assertEquals(BsDate.of(2083, 1, 1), lastMonthOfYear.firstDayOfNextMonth());
+        assertEquals(BsDate.of(2083, 1, 1), lastMonthOfYear.firstDayOfNextYear());
+    }
+
+    @Test
+    void plusWeeksAndMinusWeeks() {
+        BsDate date = BsDate.of(2082, 1, 1);
+        assertEquals(BsDate.of(2082, 1, 8), date.plusWeeks(1));
+        assertEquals(date, date.plusWeeks(1).minusWeeks(1));
+    }
+
+    @Test
+    void untilReturnsPeriodConsistentWithBsPeriodBetween() {
+        BsDate start = BsDate.of(2082, 1, 1);
+        BsDate end = BsDate.of(2083, 1, 1);
+        assertEquals(BsPeriod.of(1, 0, 0), start.until(end));
+        assertEquals(BsPeriod.between(start, end), start.until(end));
+    }
 }
