@@ -21,8 +21,8 @@ if (dob.isBefore(today)) {
 This is a multi-module Maven project (Java 21):
 
 - `core` (artifact `bikram-sambat`) — the `BsDate` type, BS↔AD conversion
-  engine, and no third-party runtime dependencies. This is the only module
-  required for calendar operations.
+  engine, plus Jackson serialization and deserialization support. This is the
+  only module required for calendar and JSON operations.
 - `jpa` (artifact `bikram-sambat-jpa`) — JPA `AttributeConverter` support for
   storing `BsDate` values in SQL `DATE` columns.
 

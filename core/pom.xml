@@ -16,11 +16,15 @@
 
     <name>Bikram Sambat</name>
     <description>
-        Core BS (Bikram Sambat / Nepali) date type with LocalDate-style API and BS/AD conversion.
-        No third-party runtime dependencies.
+        Core BS (Bikram Sambat / Nepali) date type with LocalDate-style API, BS/AD conversion, and Jackson support.
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.2</version>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
