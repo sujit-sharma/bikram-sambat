@@ -38,7 +38,9 @@
 
     <modules>
         <module>core</module>
+        <module>jackson</module>
         <module>jpa</module>
+        <module>distribution</module>
     </modules>
 
     <dependencyManagement>

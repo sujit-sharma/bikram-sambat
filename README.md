@@ -18,22 +18,40 @@ if (dob.isBefore(today)) {
 
 ## Project structure
 
-This is a multi-module Maven project (Java 21):
+This is a multi-module Maven project (Java 21) with one published distribution:
 
-- `core` (artifact `bikram-sambat`) — the `BsDate` type, BS↔AD conversion
-  engine, plus Jackson serialization and deserialization support. This is the
-  only module required for calendar and JSON operations.
-- `jpa` (artifact `bikram-sambat-jpa`) — JPA `AttributeConverter` support for
-  storing `BsDate` values in SQL `DATE` columns.
+- `core` (`bikram-sambat-core`) contains the `BsDate` type, conversion engine,
+  with no JSON library dependency.
+- `jackson` (`bikram-sambat-jackson`) provides JSON serialization and
+  deserialization for `BsDate`.
+- `jpa` (`bikram-sambat-jpa`) contains the JPA `AttributeConverter`.
+- `distribution` (`bikram-sambat`) combines these modules into one published
+  jar. Consumers add only this artifact; internal modules are not deployed.
 
-Planned modules, added incrementally:
+Add the single distribution dependency:
 
-- `bikram-sambat-jackson` — Jackson serialization/deserialization support.
-- `bikram-sambat-spring-boot-starter` — auto-configuration wiring the above.
+```xml
+<dependency>
+    <groupId>io.github.sujitsharma</groupId>
+    <artifactId>bikram-sambat</artifactId>
+    <version>v1.0.0</version>
+</dependency>
+```
+
+The distribution contains the Jackson module. Register it with your mapper, or
+let Jackson discover it through the module's service registration:
+
+```java
+ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+// Alternatively: mapper.registerModule(new BsDateJacksonModule());
+```
+
+`BsDate` fields in request and response POJOs are then read and written as
+`"yyyy-MM-dd"` JSON strings.
 
 ## JPA / Hibernate
 
-Add `bikram-sambat-jpa` alongside your JPA provider. Its converter stores the
+The distribution includes JPA support alongside the date and Jackson APIs. Its converter stores the
 Gregorian date corresponding to a `BsDate`; Hibernate maps `LocalDate` to SQL
 `DATE`. The converter has `autoApply = true`, so it applies to mapped
 `BsDate` attributes once the JPA provider discovers the converter class.
@@ -41,8 +59,8 @@ Gregorian date corresponding to a `BsDate`; Hibernate maps `LocalDate` to SQL
 ```xml
 <dependency>
     <groupId>io.github.sujitsharma</groupId>
-    <artifactId>bikram-sambat-jpa</artifactId>
-    <version>0.1.0</version>
+    <artifactId>bikram-sambat</artifactId>
+    <version>v1.0.0</version>
 </dependency>
 ```
 

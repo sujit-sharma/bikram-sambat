@@ -1,10 +1,11 @@
-package io.github.sujitsharma.bikramsambat;
+package io.github.sujitsharma.bikramsambat.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import io.github.sujitsharma.bikramsambat.BsDate;
 
 import java.io.IOException;
 

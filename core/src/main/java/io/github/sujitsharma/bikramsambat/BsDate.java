@@ -1,7 +1,5 @@
 package io.github.sujitsharma.bikramsambat;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -17,8 +15,6 @@ import java.util.Objects;
  * always representing a valid BS calendar date. Supported years range from
  * {@code MIN.getYear()} to {@code MAX.getYear()}.
  */
-@JsonSerialize(using = BsDateSerializer.class)
-@JsonDeserialize(using = BsDateDeserializer.class)
 public final class BsDate implements Comparable<BsDate>, Serializable {
 
     private static final long serialVersionUID = 1L;

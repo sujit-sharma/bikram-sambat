@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.sujitsharma</groupId>
-            <artifactId>bikram-sambat</artifactId>
+            <artifactId>bikram-sambat-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -40,7 +40,7 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.1.4</version>
                 <configuration>
-                    <skip>false</skip>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>
