@@ -6,7 +6,7 @@
 
     <groupId>io.github.sujitsharma</groupId>
     <artifactId>bikram-sambat-parent</artifactId>
-    <version>v1.0.0</version>
+    <version>v2.0.0</version>
     <packaging>pom</packaging>
 
     <name>Bikram Sambat Parent</name>
