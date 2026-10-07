@@ -43,7 +43,7 @@ Add the single distribution dependency:
 <dependency>
     <groupId>io.github.sujitsharma</groupId>
     <artifactId>bikram-sambat</artifactId>
-    <version>v2.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -112,7 +112,7 @@ Gregorian date corresponding to a `BsDate`; Hibernate maps `LocalDate` to SQL
 <dependency>
     <groupId>io.github.sujitsharma</groupId>
     <artifactId>bikram-sambat</artifactId>
-    <version>v2.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
