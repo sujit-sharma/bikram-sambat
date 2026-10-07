@@ -1,9 +1,7 @@
-# bikram-sambat
-
 # bikram-sambat (Modern Nepali Date Library for Java & Spring Boot)
 
-[![Java Version](https://shields.io)](https://java.net)
-[![License](https://shields.io)](LICENSE)
+[![Java 21](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A production-ready, highly accurate Java library for working with **Bikram Sambat (Nepali) dates**. Unlike older, unmaintained libraries, this project is built from scratch using modern **Java 21** standards, designed to match the native `java.time.LocalDate` ecosystem seamlessly.
 
@@ -77,6 +75,26 @@ The MVC conversion service registers all four conversions:
 `String` ↔ `BsDate` and `LocalDate` ↔ `BsDate`. This supports `@RequestParam`,
 `@PathVariable`, and `@ModelAttribute` binding, and formats `BsDate` values as
 `yyyy-MM-dd` when converting them to strings.
+
+The Spring module also provides Jakarta Bean Validation constraints for
+`BsDate`. Combine `@NotNull` with `@BsPast`, `@BsFuture`,
+`@BsPastOrPresent`, or `@BsFutureOrPresent` as needed:
+
+```java
+import io.github.sujitsharma.bikramsambat.BsDate;
+import io.github.sujitsharma.bikramsambat.spring.validation.BsPast;
+import jakarta.validation.constraints.NotNull;
+
+public class PersonRequest {
+    @NotNull
+    @BsPast
+    private BsDate dateOfBirth;
+}
+```
+
+These constraints compare against today's BS date using the validation clock.
+They treat `null` as valid, following Bean Validation conventions, so use
+`@NotNull` when a value is required.
 
 For Spring MVC without Spring Boot, import
 `io.github.sujitsharma.bikramsambat.spring.BsDateMvcConfiguration` into the
