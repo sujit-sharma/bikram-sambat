@@ -34,12 +34,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <junit.version>5.10.2</junit.version>
+        <spring-framework.version>7.0.9</spring-framework.version>
+        <spring-boot.version>4.0.8</spring-boot.version>
     </properties>
 
     <modules>
         <module>core</module>
         <module>jackson</module>
         <module>jpa</module>
+        <module>spring</module>
         <module>distribution</module>
     </modules>
 

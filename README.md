@@ -25,6 +25,8 @@ This is a multi-module Maven project (Java 21) with one published distribution:
 - `jackson` (`bikram-sambat-jackson`) provides JSON serialization and
   deserialization for `BsDate`.
 - `jpa` (`bikram-sambat-jpa`) contains the JPA `AttributeConverter`.
+- `spring` (`bikram-sambat-spring`) adds Spring MVC request parameter
+  conversion, with Spring Boot auto-configuration.
 - `distribution` (`bikram-sambat`) combines these modules into one published
   jar. Consumers add only this artifact; internal modules are not deployed.
 
@@ -48,6 +50,29 @@ ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
 `BsDate` fields in request and response POJOs are then read and written as
 `"yyyy-MM-dd"` JSON strings.
+
+### Spring MVC request parameters
+
+The distribution includes Spring conversion support. In a Spring Boot MVC
+application, the module registers itself automatically, so a request such as
+`?date=2083-06-20` binds to a `BsDate` controller argument:
+
+```java
+@GetMapping("/users")
+public UserResponse getUser(@RequestParam BsDate date) {
+    // date is BsDate.parse("2083-06-20")
+}
+```
+
+The MVC conversion service registers all four conversions:
+`String` ↔ `BsDate` and `LocalDate` ↔ `BsDate`. This supports `@RequestParam`,
+`@PathVariable`, and `@ModelAttribute` binding, and formats `BsDate` values as
+`yyyy-MM-dd` when converting them to strings.
+
+For Spring MVC without Spring Boot, import
+`io.github.sujitsharma.bikramsambat.spring.BsDateMvcConfiguration` into the
+MVC application context. Invalid date strings are reported as Spring request
+conversion errors.
 
 ## JPA / Hibernate
 
@@ -78,6 +103,41 @@ If your persistence setup does not discover converters automatically, list
 `io.github.sujitsharma.bikramsambat.jpa.BsDateAttributeConverter` in the
 persistence unit or annotate the field with `@Convert(converter =
 BsDateAttributeConverter.class)`.
+
+### Spring Data JPA date queries
+
+The converter also applies to query parameters, so Spring Data derived range
+and comparison queries work with `BsDate` fields. Use `BsDate` (the type name in
+this library) for the repository parameters:
+
+```java
+interface UserRepository extends JpaRepository<User, Long> {
+    List<User> findByDateOfBirthBetween(BsDate from, BsDate to);
+
+    List<User> findByDateOfBirthGreaterThanEqual(BsDate date);
+}
+```
+
+Spring Data builds the database predicates, and the JPA converter converts
+the supplied BS dates to Gregorian SQL `DATE` values for comparison. No custom
+query implementation or Spring Data dependency in this library is needed.
+
+The same conversion applies to typed JPA Criteria queries:
+
+```java
+CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+CriteriaQuery<User> query = cb.createQuery(User.class);
+Root<User> user = query.from(User.class);
+Path<BsDate> dateOfBirth = user.get("dateOfBirth");
+
+query.where(cb.between(dateOfBirth, from, to));
+// Or: query.where(cb.greaterThanOrEqualTo(dateOfBirth, date));
+```
+
+`BsDate` attributes may be nullable. The converter passes database `NULL`
+through as Java `null` and vice versa. For nullable dates, use
+`cb.isNull(dateOfBirth)` or `cb.isNotNull(dateOfBirth)`; SQL comparisons such as
+`>= null` or `between null and ...` do not match null rows.
 
 ## Building
 
