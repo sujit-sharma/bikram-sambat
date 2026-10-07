@@ -1,3 +1,4 @@
 io.github.sujitsharma.bikramsambat.spring.autoconfigure.BsDateMvcAutoConfiguration
+io.github.sujitsharma.bikramsambat.spring.autoconfigure.BsDateMvcV2AutoConfiguration
 io.github.sujitsharma.bikramsambat.spring.autoconfigure.BsDateJackson2AutoConfiguration
 io.github.sujitsharma.bikramsambat.spring.autoconfigure.BsDateJackson3AutoConfiguration

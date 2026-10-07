@@ -85,9 +85,14 @@ The MVC conversion service registers all four conversions:
 `@PathVariable`, and `@ModelAttribute` binding, and formats `BsDate` values as
 `yyyy-MM-dd` when converting them to strings.
 
-The Spring module also provides Jakarta Bean Validation constraints for
-`BsDate`. Combine `@NotNull` with `@BsPast`, `@BsFuture`,
-`@BsPastOrPresent`, or `@BsFutureOrPresent` as needed:
+The Spring module registers MVC date conversion with Spring Boot 2.x through
+`spring.factories` and with Spring Boot 3.x through
+`AutoConfiguration.imports`. It includes Bean Validation constraints for both
+API namespaces. For Boot 3, import constraints from
+`io.github.sujitsharma.bikramsambat.spring.validation`; for Boot 2, import them
+from `io.github.sujitsharma.bikramsambat.spring.validation.v2`. In either
+version, combine `@NotNull` with `@BsPast`, `@BsFuture`, `@BsPastOrPresent`, or
+`@BsFutureOrPresent` as needed:
 
 ```java
 import io.github.sujitsharma.bikramsambat.BsDate;
@@ -104,6 +109,15 @@ public class PersonRequest {
 These constraints compare against today's BS date using the validation clock.
 They treat `null` as valid, following Bean Validation conventions, so use
 `@NotNull` when a value is required.
+
+The JPA module includes converters for both persistence APIs: the default
+`io.github.sujitsharma.bikramsambat.jpa.BsDateAttributeConverter` uses
+`jakarta.persistence` for Boot 3, and
+`io.github.sujitsharma.bikramsambat.jpa.javax.BsDateAttributeConverter` uses
+`javax.persistence` for Boot 2. Both persist the Gregorian equivalent as SQL
+`DATE`. Both converters use `@Converter(autoApply = true)`, so you do not need
+to annotate every `BsDate` field with `@Convert` once the converter is included
+in the persistence unit.
 
 For Spring MVC without Spring Boot, import
 `io.github.sujitsharma.bikramsambat.spring.BsDateMvcConfiguration` into the
@@ -135,10 +149,25 @@ class Customer {
 }
 ```
 
-If your persistence setup does not discover converters automatically, list
-`io.github.sujitsharma.bikramsambat.jpa.BsDateAttributeConverter` in the
-persistence unit or annotate the field with `@Convert(converter =
-BsDateAttributeConverter.class)`.
+If Spring Boot does not discover the converter in the dependency jar, add its
+package to entity scanning once. Include your entity package as well, since
+`@EntityScan` defines the packages Spring Boot scans for managed JPA types:
+
+```java
+@SpringBootApplication
+@EntityScan(basePackages = {
+    "com.example.app.entity",
+    "io.github.sujitsharma.bikramsambat.jpa"
+})
+public class Application {
+}
+```
+
+The library package scan finds the converter that matches the active JPA API:
+Boot 2 discovers the `javax.persistence` converter; Boot 3 discovers the
+`jakarta.persistence` converter. JPA's `autoApply` rule then applies it to
+every supported `BsDate` attribute in that persistence unit. Alternatively,
+declare the matching converter once in the persistence unit's `orm.xml`.
 
 ### Spring Data JPA date queries
 
