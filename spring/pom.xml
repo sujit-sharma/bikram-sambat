@@ -19,6 +19,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+        <dependency>
             <groupId>io.github.sujitsharma</groupId>
             <artifactId>bikram-sambat-core</artifactId>
             <version>${project.version}</version>
