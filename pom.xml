@@ -11,8 +11,7 @@
 
     <name>Bikram Sambat Parent</name>
     <description>
-        A Java library for working with Bikram Sambat (Nepali) dates, designed to feel like
-        java.time.LocalDate, with accurate conversion to and from the Gregorian calendar.
+        A modern, maintained Java 21+ library for Bikram Sambat (Nepali Date) tracking, featuring native Spring Boot JSON mapping (Jackson) and JPA/Hibernate persistence converters.
     </description>
     <url>https://github.com/sujit-sharma/bikram-sambat</url>
 
@@ -26,9 +25,19 @@
     <developers>
         <developer>
             <name>Sujit Sharma</name>
-            <email>sujit.sharma@li2.com</email>
+            <email>sujit.sharma1166@gmail.com</email>
+            <roles>
+                <role>lead developer</role>
+                <role>maintainer</role>
+            </roles>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:git://://github.com</connection>
+        <developerConnection>scm:git:ssh://://github.com</developerConnection>
+        <url>https://github.com/tree/main</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

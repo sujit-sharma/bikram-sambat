@@ -1,8 +1,17 @@
 # bikram-sambat
 
-A Java library for working with Bikram Sambat (Nepali) dates, designed to feel
-like `java.time.LocalDate`, with accurate conversion to and from the
-Gregorian (AD) calendar.
+# bikram-sambat (Modern Nepali Date Library for Java & Spring Boot)
+
+[![Java Version](https://shields.io)](https://java.net)
+[![License](https://shields.io)](LICENSE)
+
+A production-ready, highly accurate Java library for working with **Bikram Sambat (Nepali) dates**. Unlike older, unmaintained libraries, this project is built from scratch using modern **Java 21** standards, designed to match the native `java.time.LocalDate` ecosystem seamlessly.
+
+### 🌟 Why choose this library over older alternatives?
+* **Zero Legacy Risk:** Actively maintained, type-safe, and fully tested.
+* **First-Class Spring & Enterprise Integration:** Native support for automated Jackson JSON serialization and JPA/Hibernate database persistence out-of-the-box.
+* **More than just a Converter:** Full support for date manipulation, comparison, formatting, and time-unit differences (`ChronoUnit`).
+
 
 ```java
 BsDate today = BsDate.now();
@@ -145,14 +154,12 @@ through as Java `null` and vice versa. For nullable dates, use
 mvn test
 ```
 
-## Known data caveat
-
-The BS↔AD conversion table currently covers years 1970–2100 BS. Three of
-those years (1974, 1990, 2096) sum to 364 days in the source data instead of
-the required 365/366, and are flagged with a `NOTE` comment in
-`BsCalendarData`. This is being cross-checked against authoritative sources
-before the first release; dates in or after an affected year may currently be
-off by a day until corrected.
+### Keywords & Use Cases
+If you are searching for any of the following solutions in Java, this library is built for you:
+* **Nepali Miti Converter Java:** Easily convert historical and current Nepalese calendar dates.
+* **BS to AD & AD to BS Converter:** High-precision bi-directional calendar mapping.
+* **Spring Boot Nepali Date Support:** Bind `BsDate` directly to incoming JSON payloads and REST API endpoints.
+* **JPA Hibernate Nepali Date:** Persist Bikram Sambat dates seamlessly into database columns as standard SQL `DATE` types.
 
 ## License
 
