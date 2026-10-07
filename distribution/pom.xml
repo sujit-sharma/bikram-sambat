@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <name>Bikram Sambat Distribution</name>
-    <description>Single-jar distribution of the core, Jackson, and JPA support modules.</description>
+    <description>Single-jar distribution of the core, Jackson, JPA, and Spring support modules.</description>
 
     <dependencies>
         <!-- Kept as a normal dependency so applications can compile against Jackson APIs. -->
@@ -37,6 +37,11 @@
         <dependency>
             <groupId>io.github.sujitsharma</groupId>
             <artifactId>bikram-sambat-jackson</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.sujitsharma</groupId>
+            <artifactId>bikram-sambat-spring</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
