@@ -47,13 +47,22 @@ Add the single distribution dependency:
 </dependency>
 ```
 
-The distribution contains the Jackson module. Register it with your mapper, or
-let Jackson discover it through the module's service registration:
+The distribution contains serializers for Jackson 2 and Jackson 3. Spring
+Boot auto-configuration selects Jackson 3 when it is present, otherwise it
+provides the Jackson 2 module bean. Only the matching module bean is created.
+For manually created mappers, register the version-specific module or let
+Jackson discover it through service registration:
 
 ```java
+// Jackson 2
 ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-// Alternatively: mapper.registerModule(new BsDateJacksonModule());
+// Or: mapper.registerModule(new BsDateJacksonModule());
 ```
+
+The Jackson 3 manual equivalent is `new BsDateJackson3Module()` with Jackson
+3's `JsonMapper`. The Jackson 2 and 3 APIs use different packages; depend on
+the version your application uses. This project is compiled for Java 17, so
+its artifacts run on Java 17 or newer.
 
 `BsDate` fields in request and response POJOs are then read and written as
 `"yyyy-MM-dd"` JSON strings.

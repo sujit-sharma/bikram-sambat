@@ -18,12 +18,6 @@
     <description>Single-jar distribution of the core, Jackson, JPA, and Spring support modules.</description>
 
     <dependencies>
-        <!-- Kept as a normal dependency so applications can compile against Jackson APIs. -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.17.2</version>
-        </dependency>
         <dependency>
             <groupId>io.github.sujitsharma</groupId>
             <artifactId>bikram-sambat-core</artifactId>
